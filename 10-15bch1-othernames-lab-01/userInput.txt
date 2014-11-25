@@ -1,0 +1,4 @@
+instructor=McGuire
+subject=AFR
+subject=MATH
+descr=Intro to Africana Studies

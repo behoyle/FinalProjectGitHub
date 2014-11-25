@@ -1,0 +1,81 @@
+class scheduler:
+    allCourses = []
+    preferenceCourses = []
+    class course:
+        def __init__(self, term, subject, catalog, section, component, descr, instructor, timeSlot, prereqs, division, wi, qfr, edi):
+            self.term = term
+            self.subject = subject
+            self.catalog = catalog
+            self.section = section
+            self.component = component
+            self.descr = descr
+            self.instructor = instructor
+            self.timeSlot = timeSlot
+            self.prereqs = prereqs
+            self.division = division
+            self.wi = wi
+            self.qfr = qfr
+            self.edi = edi
+        def print(self):
+            print(str(self.term) + str(self.subject) + str(self.catalog) + str(self.section) + str(self.component) + str(self.descr) + str(self.instructor) + str(self.timeSlot) + str(self.prereqs) + str(self.division) + str(self.wi) + str(self.qfr) + str(self.edi))
+    #%%Could add a classes taken array afterwards if we want
+    def __init__(self, preferenceStack=None):
+        self.importCourses()
+        self.importPreferences()
+        
+    def importCourses(self):
+        #preferenceStack is a list which we can treat as a stack, containting the contraints given by the user, which we will order based on restriction level
+        #parse the csv file
+        r = 0
+        
+        with open('CatalogDataNew3.csv', 'r') as csvfile:
+            for line in csvfile.readlines():
+                #remove the newline character 
+                line = line.replace('\n','')
+                data = line.split(',')
+                
+                if(r>0):
+                    self.allCourses.append(scheduler.course(data[0],data[1], data[2], data[3], data[4], data[5], data[6], self.timeGenerator(data[7], data[8], data[9], data[10], data[11], data[12]), data[13], data[14], data[15], data[16], data[17]))
+                r+=1                
+
+    def timeGenerator(self, mtg1Start, mtg1End, mtg1Days, mtg2Start, mtg2End, mtg2Days):
+        #want this to output large binary sequence where 1 corresponds to a used timeslot
+        pass
+
+    def importPreferences(self):
+        file = open('userInput.txt', 'r')
+        preferences = file.readlines()
+        for x in preferences:
+            #%%unsure if this is doing anything
+            x.replace("\n", "")
+            #%%make sure the stripping of spaces works
+            x.strip(" ")
+        #make other sortedPreferences which arranges into stack by  most restrictive
+        for pref in preferences:
+            #will make an array of the filtered course arrays
+            self.preferenceCourses.append(self.filteredCourseArray(pref))
+        self.preferenceCourses.sort(key = len)
+
+    #Method to create an array of all courses that fit within the given parameter. E.g. professor = bob
+    def filteredCourseArray(self, pref):
+        sign = pref.find("=")
+        category = pref[:sign]
+        #Value goes from sign+1 to -1 to skip the \n at the end
+        value = pref[sign+1:-1]
+        filteredCourseArray = []
+        for course in self.allCourses:
+            print("category:", getattr(course, category))
+            print("value:", value)
+            if(getattr(course, category) == value):
+                filteredCourseArray.append(course)
+                print("appended")
+        return filteredCourseArray
+
+
+if __name__ == '__main__' :
+    newSchedule = scheduler()
+    print(newSchedule.preferenceCourses)
+    #this is how we'll have
+    
+    
+#%%fix catalog number
